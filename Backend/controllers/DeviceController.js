@@ -1,21 +1,47 @@
 const DeviceModel = require("../models/DeviceModel");
 
+const acceptableTypes = ['pos', 'kisok', 'signage'];
+const acceptableStatuses = ['active', 'inactive'];
+
 const createDevice = async (request, response) => {
-    console.log(request);
+    console.log(request.body);
+    console.log(request.file);
+    const { serialNumber, type, status } = request.body;
+    const image = request.file;
     try {
-        if (!request.body.type || !request.body.image) {
+        if (!serialNumber || !type || !image) {
             return response.status(400).send({
                 message: 'Please complete all required fields!',
             });
+        } else if (!acceptableTypes.includes(type)) {
+            return response.status(400).send({ message: 'Type must be pos, kisok, or signage!' });
         }
+        if (status && !acceptableStatuses.includes(status)) {
+            return response.status(400).send({ message: `Only ${acceptableStatuses} are valid Statuses!` });
+        }
+
+        const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+        const maxImageSizeInBytes = 3 * 1024 * 1024; // 3MB
+
+        if (!ALLOWED_IMAGE_TYPES.includes(image.mimetype)) {
+            return response.status(400).send({ message: 'Invalid image file type!' });
+        } else if (image.size > maxImageSizeInBytes) {
+            return response.status(400).send({ message: 'Image size exceeds the preferred limit!' });
+        }
+
+        const base64ImageData = image.buffer.toString('base64');
+
         const newDevice = {
-            type: request.body.type,
-            image: request.body.image
+            serialNumber,
+            type,
+            image: base64ImageData,
+            status
         };
+
         //const newDevice2 = request.body;
-        const device = await DeviceModel.create(request.body);
-            /* .then(result => response.json(result))
-            .catch(error => response.json(error));*/
+        const device = await DeviceModel.create(newDevice);
+        /* .then(result => response.json(result))
+        .catch(error => response.json(error));*/
         return response.status(201).send(device);
     } catch (error) {
         console.log(error.message);
@@ -55,5 +81,6 @@ const getAllDevices = async (request, response) => {
         response.status(500).send({ message: error.message });
     }
 };
+
 
 module.exports = { createDevice, getDevice, getAllDevices };

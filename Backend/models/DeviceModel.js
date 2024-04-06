@@ -3,10 +3,12 @@ const mongoose = require('mongoose');
 const deviceSchema = new mongoose.Schema({
     serialNumber: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     type: {
         type: String,
+        enum: ['pos', 'kisok', 'signage'],
         required: true
     },
     image: {
@@ -14,7 +16,9 @@ const deviceSchema = new mongoose.Schema({
         required: true
     },
     status: {
-        type: String
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'inactive'
     }
 });
 

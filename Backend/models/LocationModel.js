@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Schema, model,  } = mongoose;
+const { Schema, model, } = mongoose;
 
 const locationSchema = new Schema({
     name: {
@@ -13,7 +13,13 @@ const locationSchema = new Schema({
     phone: {
         type: String,
         required: false
-    }
+    },
+    devices: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Devices'
+        }
+    ]
 })
 
 const LocationModel = model("Locations", locationSchema);
