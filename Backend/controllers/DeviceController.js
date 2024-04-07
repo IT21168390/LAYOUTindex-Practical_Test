@@ -21,7 +21,7 @@ const createDevice = async (request, response) => {
         }
 
         const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
-        const maxImageSizeInBytes = 3 * 1024 * 1024; // 3MB
+        const maxImageSizeInBytes = 2 * 1024 * 1024; // 2MB
 
         if (!ALLOWED_IMAGE_TYPES.includes(image.mimetype)) {
             return response.status(400).send({ message: 'Invalid image file type!' });
@@ -38,10 +38,8 @@ const createDevice = async (request, response) => {
             status
         };
 
-        //const newDevice2 = request.body;
         const device = await DeviceModel.create(newDevice);
-        /* .then(result => response.json(result))
-        .catch(error => response.json(error));*/
+
         return response.status(201).send(device);
     } catch (error) {
         console.log(error.message);
@@ -62,6 +60,9 @@ const getDevice = async (request, response) => {
         if (!device) {
             response.status(404).json({ message: "Invalid ID! No data found." })
         }
+        // Decode Base64 data
+        const image = Buffer.from(device.image, 'base64');
+        device.image = image;
         response.status(200).send(device);
     } catch (error) {
         console.log(error.message);
@@ -82,5 +83,18 @@ const getAllDevices = async (request, response) => {
     }
 };
 
+const getAllDevicesIDsSerialNumbers = async (req, res) => {
+    try {
+        const devicesIDsAndSerialNumbers = await DeviceModel.find({}, { _id: 1, serialNumber: 1 });
+        if (!devicesIDsAndSerialNumbers) {
+            res.status(404).json({ message: "Devices not found!" })
+        }
+        res.status(200).json(devicesIDsAndSerialNumbers);
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+    }
+}
 
-module.exports = { createDevice, getDevice, getAllDevices };
+
+module.exports = { createDevice, getDevice, getAllDevices, getAllDevicesIDsSerialNumbers };

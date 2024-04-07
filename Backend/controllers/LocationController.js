@@ -7,8 +7,6 @@ const addNewLocation = async (request, response) => {
             response.status(400).json({ message: "Include the 'name' property properly!" });
         }
         const newLocation = await LocationModel.create(request.body);
-        /*const location = new LocationModel(request.body);
-        const newLocation2 = await location.save();*/
         response.status(201).send(newLocation);
     } catch (error) {
         console.log(error.message);
@@ -20,7 +18,7 @@ const updateLocationDevices = async (req, res) => {
     try {
         const { id } = req.params;
         const location = await LocationModel.findByIdAndUpdate(id, { $set: { devices: req.body.devices } });
-        const updatedLocation = await LocationModel.findById(id);
+        const updatedLocation = await LocationModel.findById(id).populate('devices');
         if (!location || !updatedLocation) {
             res.status(400).json({ message: "Location not updated/found! [Probably invalid Location Id or Device(s)]" })
         }

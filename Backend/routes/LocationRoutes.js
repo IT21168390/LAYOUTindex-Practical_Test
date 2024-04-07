@@ -4,7 +4,7 @@ const { addNewLocation, getLocation, getAllLocations, updateLocationDevices } = 
 router.post('/add', addNewLocation);
 router.get('/:id', getLocation);
 router.get('/', getAllLocations);
-router.put('/:id/devices', updateLocationDevices);
+router.put('/update/:id/devices', updateLocationDevices);
 //router.delete('/:id', );
 
 module.exports = router;
