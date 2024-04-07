@@ -55,7 +55,7 @@ function Locations() {
     if (!name) {
       alert("Name is Required!");
       return;
-    } else if(phone.length!==10){
+    } else if(phone && phone.length!==10){
       alert("Enter a valid Phone number!");
       return;
     }
